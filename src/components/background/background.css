@@ -5,9 +5,7 @@
 }
 
 .area {
-  /* background: #070f71; */
-  background-color: rgba(32, 30, 48, 0.8);
-  background: -webkit-linear-gradient(to left, #8f94fb, #4e54c8);
+  background: -webkit-linear-gradient(to left, rgba(32, 30, 48, 0.8), #4e54c8);
   width: 100%;
   height: 100vh;
 }

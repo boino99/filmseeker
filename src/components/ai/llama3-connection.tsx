@@ -24,7 +24,6 @@ export default async function Llama3(description: string) {
     },
     stop: null,
   });
-  console.log(chatCompletion?.choices[0]?.message?.content);
 
   return chatCompletion?.choices[0]?.message?.content || "";
 }

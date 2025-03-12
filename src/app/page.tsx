@@ -3,7 +3,7 @@ import SearchBar from "@/components/searchBar/searchBar";
 import Background from "@/components/background/background";
 import { getServices } from "@/components/api/route";
 import Llama3 from "@/components/ai/llama3-connection";
-import logo from "../../public/Logo_film.png";
+import Image from "next/image";
 
 async function getID(name: string) {
   let id = await getServices(name);
@@ -92,11 +92,12 @@ export default function Home({
         <h1 className="text-center text-[90px] md:text-[80px] sm:text-[60px] font-days relative">
           FILMSEEKER
         </h1>
-
         <h3 className="text-center lg:text-[15px] md:text-[13px] sm:text-[10px] mb-7 relative">
           Find any movie using the power of AI, you just have to describe the
-          movie you want to find. For example: 'A man is bitten by a radioactive
-          spider'.
+          movie you want to find. For example:{" "}
+          {`"A man is bitten by a
+          radioactive spider"`}
+          .
         </h3>
         <SearchBar />
       </div>
