@@ -58,7 +58,7 @@ function Cards({ searchParams }: any) {
               className="flex items-center bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col sm:flex-row transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <img
-                className="object-cover w-50 rounded-t-lg h-96 md:w-48  md:rounded-none md:rounded-s-lg"
+                className="object-cover w-50 rounded-t-lg h-96 md:w-48 md:rounded-none md:rounded-s-lg"
                 src={await getCover(post.title, post.year)}
                 alt="movie-cover"
               />
