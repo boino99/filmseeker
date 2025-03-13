@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import Llama3 from "@/components/ai/llama3-connection";
 import { getServices } from "@/components/api/route";
 import notFound from "../../../public/not-found.jpg";
 
-async function getID(name: string) {
+async function getID(name: string, year: string) {
   let id = await getServices(name);
-  return id[0]?.imdbId;
+  let movieID = "";
+
+  if (id[0]?.releaseYear == year) {
+    movieID = id[0]?.imdbId;
+  } else {
+    movieID = id[1]?.imdbId;
+  }
+
+  return movieID;
 }
 
 async function getCover(name: string, year: string) {
@@ -30,7 +38,10 @@ async function getStreaming(name: string) {
   streaming[0]?.streamingOptions?.us?.map(async (data: any) => {
     if (data.type == "subscription") {
       services.push(
-        <p className="mb-3 font-normal text-gray-500 dark:text-gray-400">
+        <p
+          key={data?.availableSince}
+          className="mb-3 font-normal text-gray-500 dark:text-gray-400"
+        >
           {data?.service?.name}
         </p>
       );
@@ -40,25 +51,27 @@ async function getStreaming(name: string) {
   return services;
 }
 
-function Cards({ searchParams }: any) {
-  async function getResults() {
-    const query = searchParams?.query || "";
-    try {
-      let response = await Llama3(query);
-      let data = await JSON.parse(response);
-      return (
-        <>
-          {await data.results.map(async (post: any) => (
+async function getResults(searchParams: any) {
+  const query = searchParams?.query || "";
+  try {
+    let response = await Llama3(query);
+    let data = await JSON.parse(response);
+
+    return (
+      <>
+        {data ? (
+          await data.results.map(async (post: any) => (
             <a
-              key={await getID(post.title)}
+              key={await getID(post.title, post.year)}
               target="_blank"
               href={`https://www.imdb.com/es-es/title/${await getID(
-                post.title
+                post.title,
+                post.year
               )}`}
               className="flex items-center bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col sm:flex-row transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <img
-                className="object-cover w-50 rounded-t-lg h-96 md:w-48 md:rounded-none md:rounded-s-lg"
+                className="object-cover w-50 rounded-t-lg h-96 md:w-48 md:h-64 md:rounded-none md:rounded-s-lg"
                 src={await getCover(post.title, post.year)}
                 alt="movie-cover"
               />
@@ -72,17 +85,24 @@ function Cards({ searchParams }: any) {
                 {await getStreaming(post.title)}
               </div>
             </a>
-          ))}
-        </>
-      );
-    } catch (error) {
-      console.log(`se ha descubierto un error ${error}`);
-    }
+          ))
+        ) : (
+          <div></div>
+        )}
+      </>
+    );
+  } catch (error) {
+    console.log(`se ha descubierto un error ${error}`);
   }
+}
 
+function Cards({ searchParams }: any) {
   return (
-    <div className="grid  w-full p-10 gap-6 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 z-0">
-      {getResults()}
+    <div
+      key={searchParams?.query}
+      className="grid  w-full p-10 gap-6 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 z-0"
+    >
+      {searchParams?.query ? getResults(searchParams) : <div></div>}
     </div>
   );
 }
