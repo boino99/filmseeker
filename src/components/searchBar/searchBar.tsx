@@ -20,7 +20,7 @@ const SearchBar = () => {
   };
 
   return (
-    <div className="flex w-full flex-row gap-5">
+    <div className="flex w-full flex-col gap-5 lg:flex-row">
       <Input
         type="text"
         placeholder="Describe the movie..."
