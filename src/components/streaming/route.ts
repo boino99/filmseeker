@@ -1,4 +1,4 @@
-export async function getServices(title: string) {
+export async function getServices(title: any) {
   const url = `https://streaming-availability.p.rapidapi.com/shows/search/title?country=us&title=${title}&series_granularity=show&show_type=movie&output_language=en`;
   const options = {
     method: "GET",
@@ -9,8 +9,8 @@ export async function getServices(title: string) {
   };
 
   try {
-    const response = await fetch(url, options);
-    const result = await response.json();
+    const res = await fetch(url, options);
+    const result = await res.json();
     return result;
   } catch (error) {
     console.error(error);

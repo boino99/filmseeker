@@ -1,110 +1,148 @@
-import React, { useState } from "react";
-import Llama3 from "@/components/ai/llama3-connection";
-import { getServices } from "@/components/api/route";
+"use client";
+
+import React, { useEffect, useState } from "react";
+import Loader from "../loader/loader";
 import notFound from "../../../public/not-found.jpg";
+import { getServices } from "../streaming/route";
 
-async function getID(name: string, year: string) {
-  let id = await getServices(name);
-  let movieID = "";
+// async function getCover(title: string, year: string) {
+//   const cover = await getServices(title);
+//   let image = "";
 
-  if (id[0]?.releaseYear == year) {
-    movieID = id[0]?.imdbId;
-  } else {
-    movieID = id[1]?.imdbId;
-  }
+//   if (cover[0]?.releaseYear == year) {
+//     image = cover[0]?.imageSet?.verticalPoster?.w240;
+//   } else if (cover[1]?.releaseYear == year) {
+//     image = cover[1]?.imageSet?.verticalPoster?.w240;
+//   } else {
+//     image = "";
+//   }
 
-  return movieID;
-}
+//   return image;
+// }
 
-async function getCover(name: string, year: string) {
-  let cover = await getServices(name);
-  let image = "";
+// async function getStreaming(title: string, year: string) {
+//   let streaming = await getServices(title);
+//   let data = streaming.map((data: any) => {
+//     if (data?.releaseYear == year) {
+//       return data?.streamingOptions?.us;
+//     }
+//   });
+//   return data
+//     ?.filter((data: any) => data?.type === "subscription")
+//     ?.map((data: any) => data.service.name);
+// }
 
-  if (cover[0]?.releaseYear == year) {
-    image = cover[0]?.imageSet?.verticalPoster?.w240;
-  } else if (cover[1]?.releaseYear == year) {
-    image = cover[1]?.imageSet?.verticalPoster?.w240;
-  } else {
-    image = notFound.src;
-  }
+// async function getID(name: string, year: string) {
+//   let id = await getServices(name);
+//   let movieID = "";
 
-  return image;
-}
+//   if (id[0]?.releaseYear == year) {
+//     movieID = id[0]?.imdbId;
+//   } else {
+//     movieID = id[1]?.imdbId;
+//   }
 
-async function getStreaming(name: string) {
-  let streaming = await getServices(name);
-  let services: any[] = [];
-  services = [];
-  streaming[0]?.streamingOptions?.us?.map(async (data: any) => {
-    if (data.type == "subscription") {
-      services.push(
-        <p
-          key={data?.availableSince}
-          className="mb-3 font-normal text-gray-500 dark:text-gray-400"
-        >
-          {data?.service?.name}
-        </p>
-      );
-    }
-  });
+//   return movieID;
+// }
 
-  return services;
-}
+// function getCover(name: string, year: string) {
+//   let cover = getServices(name);
+//   let image = "";
 
-async function getResults(searchParams: any) {
-  const query = searchParams?.query || "";
-  try {
-    let response = await Llama3(query);
-    let data = await JSON.parse(response);
+//   if (cover[0]?.releaseYear == year) {
+//     image = cover[0]?.imageSet?.verticalPoster?.w240;
+//   } else if (cover[1]?.releaseYear == year) {
+//     image = cover[1]?.imageSet?.verticalPoster?.w240;
+//   } else {
+//     image = notFound.src;
+//   }
 
-    return (
-      <>
-        {data ? (
-          await data.results.map(async (post: any) => (
-            <a
-              key={await getID(post.title, post.year)}
-              target="_blank"
-              href={`https://www.imdb.com/es-es/title/${await getID(
-                post.title,
-                post.year
-              )}`}
-              className="flex items-center bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col sm:flex-row transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+//   return image;
+// }
+
+// function getStreaming(name: string) {
+//   let streaming = getServices(name);
+//   let services: any[] = [];
+//   services = [];
+//   streaming[0]?.streamingOptions?.us?.map(async (data: any) => {
+//     if (data.type == "subscription") {
+//       services.push(
+//         <p
+//           key={data?.availableSince}
+//           className="mb-3 font-normal text-gray-500 dark:text-gray-400"
+//         >
+//           {data?.service?.name}
+//         </p>
+//       );
+//     }
+//   });
+
+//   return services;
+// }
+
+function GetData(query: any) {}
+
+const Cards = ({ query }: { query: string }) => {
+  const [movies, setMovies] = useState<
+    { title: string; year: string; cover: string; streaming: [] }[]
+  >([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!query) return;
+
+    setLoading(true);
+    fetch(`/api/search?query=${encodeURIComponent(query)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setMovies(data.results || []);
+      })
+      .catch(() => setMovies([]))
+      .finally(() => setLoading(false));
+  }, [query]);
+
+  return (
+    <div>
+      {loading ? (
+        <Loader />
+      ) : movies.length > 0 ? (
+        <div className="grid w-full p-10 gap-6 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 z-0">
+          {movies.map((movie, index) => (
+            <div
+              key={index}
+              className="relative flex items-center bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <img
-                className="object-cover w-50 rounded-t-lg h-96 md:w-48 md:h-64 md:rounded-none md:rounded-s-lg"
-                src={await getCover(post.title, post.year)}
+                className="object-cover w-full rounded-t-lg max-h-full"
+                src={movie.cover}
                 alt="movie-cover"
               />
               <div className="flex flex-col justify-between p-4 leading-normal">
-                <h5 className="mb-2 text-2xl font-bold tracking-tight text-white ">
-                  {post.title} {`(${post.year})`}
-                </h5>
-                <p className="mb-3 font-bold text-gray-300 dark:text-gray-400">
+                <h3 className="text-white text-xl">
+                  {movie.title} ({movie.year})
+                </h3>
+                <p className="mb-3 font-bold text-gray-400 dark:text-gray-400">
                   Streaming options
                 </p>
-                {await getStreaming(post.title)}
+                {movie.streaming.length > 0 ? (
+                  <p
+                    key={index + movie.title}
+                    className="mb-3 font-normal text-gray-500 dark:text-gray-400"
+                  >
+                    {movie.streaming}
+                  </p>
+                ) : (
+                  <p className="text-gray-500">No disponible</p>
+                )}
               </div>
-            </a>
-          ))
-        ) : (
-          <div></div>
-        )}
-      </>
-    );
-  } catch (error) {
-    console.log(`se ha descubierto un error ${error}`);
-  }
-}
-
-function Cards({ searchParams }: any) {
-  return (
-    <div
-      key={searchParams?.query}
-      className="grid  w-full p-10 gap-6 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 z-0"
-    >
-      {searchParams?.query ? getResults(searchParams) : <div></div>}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <></>
+      )}
     </div>
   );
-}
+};
 
 export default Cards;
