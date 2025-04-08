@@ -20,11 +20,11 @@ export async function GET(req: Request) {
         {
           role: "system",
           content:
-            'Eres un sistema para buscar películas basado en la descripción que se ingresa y respondes en formato JSON en cualquier idioma, Una lista con maximo 20 peliculas, debe estar en JSON y debe tener la siguiente estructura: {"results": [{"title", "year"}]}',
+            'Eres un sistema para buscar películas basado en la descripción que se ingresa y respondes en formato JSON en cualquier idioma, Una lista con maximo 10 peliculas, debe estar en JSON y debe tener la siguiente estructura: {"results": [{"title", "year"}]}',
         },
         { role: "user", content: description },
       ],
-      model: "mixtral-8x7b-32768",
+      model: "llama3-8b-8192",
       temperature: 1,
       max_tokens: 1024,
       top_p: 1,
