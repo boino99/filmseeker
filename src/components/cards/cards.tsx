@@ -110,27 +110,33 @@ const Cards = ({ query }: { query: string }) => {
           {movies.map((movie, index) => (
             <div
               key={index}
-              className="relative flex items-center bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
+              className="relative flex justify-start bg-black/30 backdrop-blur-none rounded-lg shadow-lg flex-col  transition delay-150 duration-300 ease-in-out hover:-translate-y-1 scale-10 lg:scale-100 sm:scale-30 hover:scale-110 hover:bg-black/90 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700"
             >
               <img
                 className="object-cover w-full rounded-t-lg max-h-full"
                 src={movie.cover}
                 alt="movie-cover"
               />
-              <div className="flex flex-col justify-between p-4 leading-normal">
+              <div className="flex flex-col justify-start p-4 leading-normal">
                 <h3 className="text-white text-xl">
-                  {movie.title} ({movie.year})
+                  {`${movie.title} (${movie.year})`}
                 </h3>
                 <p className="mb-3 font-bold text-gray-400 dark:text-gray-400">
                   Streaming options
                 </p>
                 {movie.streaming.length > 0 ? (
-                  <p
+                  <ul
                     key={index + movie.title}
-                    className="mb-3 font-normal text-gray-500 dark:text-gray-400"
+                    className="block mb-3 font-normal text-gray-500 dark:text-gray-400"
                   >
-                    {movie.streaming}
-                  </p>
+                    {movie.streaming
+                      .filter(
+                        (item, index, self) => self.indexOf(item) === index
+                      )
+                      .map((streaming, index) => (
+                        <li key={index}>{streaming}</li>
+                      ))}
+                  </ul>
                 ) : (
                   <p className="text-gray-500">No disponible</p>
                 )}
